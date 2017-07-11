@@ -12,10 +12,12 @@ cc_path = ""
 cc_name = ""
 cc_sysroot_lib = ""
 cc_version = ""
+dst_lib_dir = ""
 
 def set_global(args):
     global pkg_path
     global output_dir
+    global dst_lib_dir
     global arch
     global arch_cc_version
     global cross_compiler_tarball
@@ -68,6 +70,8 @@ def set_global(args):
     else:
         sys.exit(1)
 
+    dst_lib_dir = ops.path_join(output_dir, "lib")
+
 def MAIN_ENV(args):
     set_global(args)
 
@@ -75,24 +79,106 @@ def MAIN_ENV(args):
     ops.exportEnv(ops.setEnv("CROSS_COMPILE", cc_name))
     return False
 
-def MAIN_EXTRACT(args):
-    set_global(args)
+def copy_cc_libs():
+    # Copy libraries from compiler sysroot
+    cc_lib_path = cc_sysroot_lib
 
-    if cross_compiler_tarball_root == "/opt":
-        if ops.isExist(ops.path_join(cross_compiler_tarball_root, arch_cc_version)):
-            return False
+    ops.mkdir(dst_lib_dir)
+    ops.copyto(ops.path_join(cc_lib_path, "libgcc_s.so.1"), dst_lib_dir)
+    ops.copyto(ops.path_join(cc_lib_path, "libgcc_s.so"), dst_lib_dir)
 
-    if cross_compiler_tarball_type == "XZ":
-        ops.unTarXz(cross_compiler_tarball, cross_compiler_tarball_root)
-    elif cross_compiler_tarball_type == "BZ2":
-        ops.unTarBz2(cross_compiler_tarball, cross_compiler_tarball_root)
-    elif cross_compiler_tarball_type == "GZ":
-        ops.unTarGz(cross_compiler_tarball, cross_compiler_tarball_root)
+    ops.copyto(ops.path_join(cc_lib_path, "ld-{}.so".format(cc_version)), dst_lib_dir)
+    if arch == "armhf":
+        ops.copyto(ops.path_join(cc_lib_path, "ld-linux-armhf.so.3"), dst_lib_dir)
+        ops.ln(dst_lib_dir, "ld-linux-armhf.so.3", "ld-linux-armhf.so")
+    elif arch == "armel":
+        ops.copyto(ops.path_join(cc_lib_path, "ld-linux.so.3"), dst_lib_dir)
+        ops.ln(dst_lib_dir, "ld-linux.so.3", "ld-linux.so")
     else:
         sys.exit(1)
 
+    ops.copyto(ops.path_join(cc_lib_path, "libc-{}.so".format(cc_version)), dst_lib_dir)
+    ops.ln(dst_lib_dir, "libc-{}.so".format(cc_version), "libc.so.6")
+    ops.ln(dst_lib_dir, "libc-{}.so".format(cc_version), "libc.so")
+
+    ops.copyto(ops.path_join(cc_lib_path, "librt-{}.so".format(cc_version)), dst_lib_dir)
+    ops.ln(dst_lib_dir, "librt-{}.so".format(cc_version), "librt.so.1")
+    ops.ln(dst_lib_dir, "librt-{}.so".format(cc_version), "librt.so")
+
+    ops.copyto(ops.path_join(cc_lib_path, "libpthread-{}.so".format(cc_version)), dst_lib_dir)
+    ops.ln(dst_lib_dir, "libpthread-{}.so".format(cc_version), "libpthread.so.0")
+    ops.ln(dst_lib_dir, "libpthread-{}.so".format(cc_version), "libpthread.so")
+
+    ops.copyto(ops.path_join(cc_lib_path, "libdl-{}.so".format(cc_version)), dst_lib_dir)
+    ops.ln(dst_lib_dir, "libdl-{}.so".format(cc_version), "libdl.so.2")
+    ops.ln(dst_lib_dir, "libdl-{}.so".format(cc_version), "libdl.so")
+
+    ops.copyto(ops.path_join(cc_lib_path, "libm-{}.so".format(cc_version)), dst_lib_dir)
+    ops.ln(dst_lib_dir, "libm-{}.so".format(cc_version), "libm.so.6")
+    ops.ln(dst_lib_dir, "libm-{}.so".format(cc_version), "libm.so")
+
+    ops.copyto(ops.path_join(cc_lib_path, "libcrypt-{}.so".format(cc_version)), dst_lib_dir)
+    ops.ln(dst_lib_dir, "libcrypt-{}.so".format(cc_version), "libcrypt.so.1")
+    ops.ln(dst_lib_dir, "libcrypt-{}.so".format(cc_version), "libcrypt.so")
+
+    ops.copyto(ops.path_join(cc_lib_path, "libnsl-{}.so".format(cc_version)), dst_lib_dir)
+    ops.ln(dst_lib_dir, "libnsl-{}.so".format(cc_version), "libnsl.so.1")
+    ops.ln(dst_lib_dir, "libnsl-{}.so".format(cc_version), "libnsl.so")
+
+    ops.copyto(ops.path_join(cc_lib_path, "libnss_compat-{}.so".format(cc_version)), dst_lib_dir)
+    ops.ln(dst_lib_dir, "libnss_compat-{}.so".format(cc_version), "libnss_compat.so.2")
+    ops.ln(dst_lib_dir, "libnss_compat-{}.so".format(cc_version), "libnss_compat.so")
+
+    ops.copyto(ops.path_join(cc_lib_path, "libnss_db-{}.so".format(cc_version)), dst_lib_dir)
+    ops.ln(dst_lib_dir, "libnss_db-{}.so".format(cc_version), "libnss_db.so.2")
+    ops.ln(dst_lib_dir, "libnss_db-{}.so".format(cc_version), "libnss_db.so")
+
+    ops.copyto(ops.path_join(cc_lib_path, "libnss_dns-{}.so".format(cc_version)), dst_lib_dir)
+    ops.ln(dst_lib_dir, "libnss_dns-{}.so".format(cc_version), "libnss_dns.so.2")
+    ops.ln(dst_lib_dir, "libnss_dns-{}.so".format(cc_version), "libnss_dns.so")
+
+    ops.copyto(ops.path_join(cc_lib_path, "libnss_files-{}.so".format(cc_version)), dst_lib_dir)
+    ops.ln(dst_lib_dir, "libnss_files-{}.so".format(cc_version), "libnss_files.so.2")
+    ops.ln(dst_lib_dir, "libnss_files-{}.so".format(cc_version), "libnss_files.so")
+
+    ops.copyto(ops.path_join(cc_lib_path, "libnss_hesiod-{}.so".format(cc_version)), dst_lib_dir)
+    ops.ln(dst_lib_dir, "libnss_hesiod-{}.so".format(cc_version), "libnss_hesiod.so.2")
+    ops.ln(dst_lib_dir, "libnss_hesiod-{}.so".format(cc_version), "libnss_hesiod.so")
+
+    ops.copyto(ops.path_join(cc_lib_path, "libnss_nis-{}.so".format(cc_version)), dst_lib_dir)
+    ops.ln(dst_lib_dir, "libnss_nis-{}.so".format(cc_version), "libnss_nis.so.2")
+    ops.ln(dst_lib_dir, "libnss_nis-{}.so".format(cc_version), "libnss_nis.so")
+
+    ops.copyto(ops.path_join(cc_lib_path, "libnss_nisplus-{}.so".format(cc_version)), dst_lib_dir)
+    ops.ln(dst_lib_dir, "libnss_nisplus-{}.so".format(cc_version), "libnss_nisplus.so.2")
+    ops.ln(dst_lib_dir, "libnss_nisplus-{}.so".format(cc_version), "libnss_nisplus.so")
+
+    ops.copyto(ops.path_join(cc_lib_path, "libresolv-{}.so".format(cc_version)), dst_lib_dir)
+    ops.ln(dst_lib_dir, "libresolv-{}.so".format(cc_version), "libresolv.so.2")
+    ops.ln(dst_lib_dir, "libresolv-{}.so".format(cc_version), "libresolv.so")
+
+def MAIN_EXTRACT(args):
+    set_global(args)
+    cc_exist = False
+
     if cross_compiler_tarball_root == "/opt":
-        ops.touch(ops.path_join(cross_compiler_tarball_root, arch_cc_version))
+        if ops.isExist(ops.path_join(cross_compiler_tarball_root, arch_cc_version)):
+            cc_exist = True
+
+    if not cc_exist:
+        if cross_compiler_tarball_type == "XZ":
+            ops.unTarXz(cross_compiler_tarball, cross_compiler_tarball_root)
+        elif cross_compiler_tarball_type == "BZ2":
+            ops.unTarBz2(cross_compiler_tarball, cross_compiler_tarball_root)
+        elif cross_compiler_tarball_type == "GZ":
+            ops.unTarGz(cross_compiler_tarball, cross_compiler_tarball_root)
+        else:
+            sys.exit(1)
+
+        if cross_compiler_tarball_root == "/opt":
+            ops.touch(ops.path_join(cross_compiler_tarball_root, arch_cc_version))
+    else:
+        copy_cc_libs()
 
     return True
 
@@ -118,36 +204,7 @@ def MAIN_BUILD(args):
 
 def MAIN_INSTALL(args):
     set_global(args)
-    cc_lib_path = cc_sysroot_lib
- 
-    if arch == "armhf":
-        iopc.installBin(args["pkg_name"], ops.path_join(cc_lib_path, "ld-linux-armhf.so.3"), "lib")
-
-    if arch == "armel":
-        iopc.installBin(args["pkg_name"], ops.path_join(cc_lib_path, "ld-linux.so.3"), "lib")
-
-    iopc.installBin(args["pkg_name"], ops.path_join(cc_lib_path, "libgcc_s.so.1"), "lib")
-    iopc.installBin(args["pkg_name"], ops.path_join(cc_lib_path, "libgcc_s.so"), "lib")
-
-    iopc.installBin(args["pkg_name"], ops.path_join(cc_lib_path, "ld-{}.so".format(cc_version)), "lib")
-
-    iopc.installBin(args["pkg_name"], ops.path_join(cc_lib_path, "libc-{}.so".format(cc_version)), "lib")
-    iopc.installBin(args["pkg_name"], ops.path_join(cc_lib_path, "libc.so.6"), "lib")
-
-    iopc.installBin(args["pkg_name"], ops.path_join(cc_lib_path, "librt-{}.so".format(cc_version)), "lib")
-    iopc.installBin(args["pkg_name"], ops.path_join(cc_lib_path, "librt.so.1"), "lib")
-
-    iopc.installBin(args["pkg_name"], ops.path_join(cc_lib_path, "libpthread-{}.so".format(cc_version)), "lib")
-    iopc.installBin(args["pkg_name"], ops.path_join(cc_lib_path, "libpthread.so.0"), "lib")
-
-    iopc.installBin(args["pkg_name"], ops.path_join(cc_lib_path, "libdl-{}.so".format(cc_version)), "lib")
-    iopc.installBin(args["pkg_name"], ops.path_join(cc_lib_path, "libdl.so.2"), "lib")
-
-    iopc.installBin(args["pkg_name"], ops.path_join(cc_lib_path, "libm-{}.so".format(cc_version)), "lib")
-    iopc.installBin(args["pkg_name"], ops.path_join(cc_lib_path, "libm.so.6"), "lib")
-
-    iopc.installBin(args["pkg_name"], ops.path_join(cc_lib_path, "libcrypt-{}.so".format(cc_version)), "lib")
-    iopc.installBin(args["pkg_name"], ops.path_join(cc_lib_path, "libcrypt.so.1"), "lib")
+    iopc.installBin(args["pkg_name"], ops.path_join(dst_lib_dir, "."), "lib")
 
     return False
 
