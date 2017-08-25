@@ -32,7 +32,15 @@ def set_global(args):
     arch = ops.getEnv("ARCH_ALT")
     pkg_args = args["pkg_args"]
     arch_cc_version = pkg_args["version"]
-    if arch == "armhf":
+    if arch_cc_version == "Linaro-2017.01":
+        cross_compiler_tarball = ops.path_join(pkg_path, "gcc-linaro-5.4.1-2017.01-x86_64_arm-linux-gnueabi.tar.xz")
+        cross_compiler_tarball_type = "XZ"
+        cross_compiler_tarball_root = output_dir
+        cc_path=ops.path_join(output_dir, "gcc-linaro-5.4.1-2017.01-x86_64_arm-linux-gnueabi/bin")
+        cc_name=ops.path_join(cc_path, "arm-linux-gnueabi-")
+        cc_sysroot_lib = ops.path_join(output_dir, "gcc-linaro-5.4.1-2017.01-x86_64_arm-linux-gnueabi/arm-linux-gnueabi/libc/lib")
+        cc_version = "2.21"
+    elif arch_cc_version == "Linaro-2017.01hf":
         cross_compiler_tarball = ops.path_join(pkg_path, "gcc-linaro-5.4.1-2017.01-x86_64_arm-linux-gnueabihf.tar.xz")
         cross_compiler_tarball_type = "XZ"
         cross_compiler_tarball_root = output_dir
@@ -40,33 +48,30 @@ def set_global(args):
         cc_name=ops.path_join(cc_path, "arm-linux-gnueabihf-")
         cc_sysroot_lib = ops.path_join(output_dir, "gcc-linaro-5.4.1-2017.01-x86_64_arm-linux-gnueabi/arm-linux-gnueabi/libc/lib")
         cc_version = "2.21"
-    elif arch == "armel":
-        if arch_cc_version == "Linaro-2017.01":
-            cross_compiler_tarball = ops.path_join(pkg_path, "gcc-linaro-5.4.1-2017.01-x86_64_arm-linux-gnueabi.tar.xz")
-            cross_compiler_tarball_type = "XZ"
-            cross_compiler_tarball_root = output_dir
-            cc_path=ops.path_join(output_dir, "gcc-linaro-5.4.1-2017.01-x86_64_arm-linux-gnueabi/bin")
-            cc_name=ops.path_join(cc_path, "arm-linux-gnueabi-")
-            cc_sysroot_lib = ops.path_join(output_dir, "gcc-linaro-5.4.1-2017.01-x86_64_arm-linux-gnueabi/arm-linux-gnueabi/libc/lib")
-            cc_version = "2.21"
-        elif arch_cc_version == "CodeSourcery-2014.05":
-            cross_compiler_tarball = ops.path_join(pkg_path, "arm-2014.05-29-arm-none-linux-gnueabi-i686-pc-linux-gnu.tar.bz2")
-            cross_compiler_tarball_type = "BZ2"
-            cross_compiler_tarball_root = output_dir
-            cc_path=ops.path_join(output_dir, "arm-2014.05/bin")
-            cc_name=ops.path_join(cc_path, "arm-none-linux-gnueabi-")
-            cc_sysroot_lib = ops.path_join(output_dir, "arm-2014.05/arm-none-linux-gnueabi/libc/armv4t/lib")
-            cc_version = "2.18"
-        elif arch_cc_version == "iopc_gcc_armel_2017.02.3":
-            cross_compiler_tarball = ops.path_join(pkg_path, "iopc_gcc_armel_2017.02.3.tar.xz")
-            cross_compiler_tarball_type = "XZ"
-            cross_compiler_tarball_root = "/opt"
-            cc_path=ops.path_join(cross_compiler_tarball_root, "iopc_gcc_armel_2017.02.3/usr/bin")
-            cc_name=ops.path_join(cc_path, "arm-iopc-linux-gnueabi-")
-            cc_sysroot_lib = ops.path_join(cross_compiler_tarball_root, "iopc_gcc_armel_2017.02.3/usr/arm-iopc-linux-gnueabi/sysroot/lib")
-            cc_version = "2.24"
-        else:
-            sys.exit(1)
+    elif arch_cc_version == "CodeSourcery-2014.05":
+        cross_compiler_tarball = ops.path_join(pkg_path, "arm-2014.05-29-arm-none-linux-gnueabi-i686-pc-linux-gnu.tar.bz2")
+        cross_compiler_tarball_type = "BZ2"
+        cross_compiler_tarball_root = output_dir
+        cc_path=ops.path_join(output_dir, "arm-2014.05/bin")
+        cc_name=ops.path_join(cc_path, "arm-none-linux-gnueabi-")
+        cc_sysroot_lib = ops.path_join(output_dir, "arm-2014.05/arm-none-linux-gnueabi/libc/armv4t/lib")
+        cc_version = "2.18"
+    elif arch_cc_version == "iopc_gcc_armel_2017.02.3":
+        cross_compiler_tarball = ops.path_join(pkg_path, "iopc_gcc_armel_2017.02.3.tar.xz")
+        cross_compiler_tarball_type = "XZ"
+        cross_compiler_tarball_root = "/opt"
+        cc_path=ops.path_join(cross_compiler_tarball_root, "iopc_gcc_armel_2017.02.3/usr/bin")
+        cc_name=ops.path_join(cc_path, "arm-iopc-linux-gnueabi-")
+        cc_sysroot_lib = ops.path_join(cross_compiler_tarball_root, "iopc_gcc_armel_2017.02.3/usr/arm-iopc-linux-gnueabi/sysroot/lib")
+        cc_version = "2.24"
+    elif arch_cc_version == "iopc_gcc_x86_64_2017.02.3":
+        cross_compiler_tarball = ops.path_join(pkg_path, "iopc_gcc_x86_64_2017.02.3.tar.xz")
+        cross_compiler_tarball_type = "XZ"
+        cross_compiler_tarball_root = "/opt"
+        cc_path=ops.path_join(cross_compiler_tarball_root, "iopc_gcc_x86_64_2017.02.3/usr/bin")
+        cc_name=ops.path_join(cc_path, "x86_64-iopc-linux-gnu-")
+        cc_sysroot_lib = ops.path_join(cross_compiler_tarball_root, "iopc_gcc_x86_64_2017.02.3/usr/x86_64-iopc-linux-gnu/sysroot/lib")
+        cc_version = "2.24"
     else:
         sys.exit(1)
 
@@ -82,8 +87,11 @@ def MAIN_ENV(args):
 def copy_cc_libs():
     # Copy libraries from compiler sysroot
     cc_lib_path = cc_sysroot_lib
-
     ops.mkdir(dst_lib_dir)
+
+    if arch == "any":
+        return 
+
     ops.copyto(ops.path_join(cc_lib_path, "libgcc_s.so.1"), dst_lib_dir)
     ops.copyto(ops.path_join(cc_lib_path, "libgcc_s.so"), dst_lib_dir)
 
@@ -94,6 +102,9 @@ def copy_cc_libs():
     elif arch == "armel":
         ops.copyto(ops.path_join(cc_lib_path, "ld-linux.so.3"), dst_lib_dir)
         ops.ln(dst_lib_dir, "ld-linux.so.3", "ld-linux.so")
+    elif arch == "x86_64":
+        ops.copyto(ops.path_join(cc_lib_path, "ld-linux-x86-64.so.2"), dst_lib_dir)
+        ops.ln(dst_lib_dir, "ld-linux-x86-64.so.2", "ld-linux.so")
     else:
         sys.exit(1)
 
@@ -174,9 +185,6 @@ def MAIN_EXTRACT(args):
             ops.unTarGz(cross_compiler_tarball, cross_compiler_tarball_root)
         else:
             sys.exit(1)
-
-        if cross_compiler_tarball_root == "/opt":
-            ops.touch(ops.path_join(cross_compiler_tarball_root, arch_cc_version))
     else:
         copy_cc_libs()
 
