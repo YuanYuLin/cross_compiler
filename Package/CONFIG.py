@@ -35,7 +35,7 @@ def set_global(args):
     if arch_cc_version == "Linaro-2017.01":
         cross_compiler_tarball = ops.path_join(pkg_path, "gcc-linaro-5.4.1-2017.01-x86_64_arm-linux-gnueabi.tar.xz")
         cross_compiler_tarball_type = "XZ"
-        cross_compiler_tarball_root = output_dir
+        cross_compiler_tarball_root = "/opt" #ops.path_join("/opt", "IOPC")
         cc_path=ops.path_join(output_dir, "gcc-linaro-5.4.1-2017.01-x86_64_arm-linux-gnueabi/bin")
         cc_name=ops.path_join(cc_path, "arm-linux-gnueabi-")
         cc_sysroot_lib = ops.path_join(output_dir, "gcc-linaro-5.4.1-2017.01-x86_64_arm-linux-gnueabi/arm-linux-gnueabi/libc/lib")
@@ -43,7 +43,7 @@ def set_global(args):
     elif arch_cc_version == "Linaro-2017.01hf":
         cross_compiler_tarball = ops.path_join(pkg_path, "gcc-linaro-5.4.1-2017.01-x86_64_arm-linux-gnueabihf.tar.xz")
         cross_compiler_tarball_type = "XZ"
-        cross_compiler_tarball_root = output_dir
+        cross_compiler_tarball_root = "/opt" #ops.path_join("/opt", "IOPC")
         cc_path=ops.path_join(output_dir, "gcc-linaro-5.4.1-2017.01-x86_64_arm-linux-gnueabihf/bin")
         cc_name=ops.path_join(cc_path, "arm-linux-gnueabihf-")
         cc_sysroot_lib = ops.path_join(output_dir, "gcc-linaro-5.4.1-2017.01-x86_64_arm-linux-gnueabi/arm-linux-gnueabi/libc/lib")
@@ -51,7 +51,7 @@ def set_global(args):
     elif arch_cc_version == "CodeSourcery-2014.05":
         cross_compiler_tarball = ops.path_join(pkg_path, "arm-2014.05-29-arm-none-linux-gnueabi-i686-pc-linux-gnu.tar.bz2")
         cross_compiler_tarball_type = "BZ2"
-        cross_compiler_tarball_root = output_dir
+        cross_compiler_tarball_root = "/opt" #ops.path_join("/opt", "IOPC")
         cc_path=ops.path_join(output_dir, "arm-2014.05/bin")
         cc_name=ops.path_join(cc_path, "arm-none-linux-gnueabi-")
         cc_sysroot_lib = ops.path_join(output_dir, "arm-2014.05/arm-none-linux-gnueabi/libc/armv4t/lib")
@@ -59,7 +59,7 @@ def set_global(args):
     elif arch_cc_version == "iopc_gcc_armel_2017.02.3":
         cross_compiler_tarball = ops.path_join(pkg_path, "iopc_gcc_armel_2017.02.3.tar.xz")
         cross_compiler_tarball_type = "XZ"
-        cross_compiler_tarball_root = "/opt"
+        cross_compiler_tarball_root = "/opt" #ops.path_join("/opt", "IOPC")
         cc_path=ops.path_join(cross_compiler_tarball_root, "iopc_gcc_armel_2017.02.3/usr/bin")
         cc_name=ops.path_join(cc_path, "arm-iopc-linux-gnueabi-")
         cc_sysroot_lib = ops.path_join(cross_compiler_tarball_root, "iopc_gcc_armel_2017.02.3/usr/arm-iopc-linux-gnueabi/sysroot/lib")
@@ -67,7 +67,7 @@ def set_global(args):
     elif arch_cc_version == "iopc_gcc_x86_64_2017.02.3":
         cross_compiler_tarball = ops.path_join(pkg_path, "iopc_gcc_x86_64_2017.02.3.tar.xz")
         cross_compiler_tarball_type = "XZ"
-        cross_compiler_tarball_root = "/opt"
+        cross_compiler_tarball_root = "/opt" #ops.path_join("/opt", "IOPC")
         cc_path=ops.path_join(cross_compiler_tarball_root, "iopc_gcc_x86_64_2017.02.3/usr/bin")
         cc_name=ops.path_join(cc_path, "x86_64-iopc-linux-gnu-")
         cc_sysroot_lib = ops.path_join(cross_compiler_tarball_root, "iopc_gcc_x86_64_2017.02.3/usr/x86_64-iopc-linux-gnu/sysroot/lib")
@@ -172,21 +172,22 @@ def MAIN_EXTRACT(args):
     set_global(args)
     cc_exist = False
 
-    if cross_compiler_tarball_root == "/opt":
-        if ops.isExist(ops.path_join(cross_compiler_tarball_root, arch_cc_version)):
-            cc_exist = True
+    #ops.mkdir(cross_compiler_tarball_root)
+    if ops.isExist(ops.path_join(cross_compiler_tarball_root, arch_cc_version)):
+        cc_exist = True
 
     if not cc_exist:
         if cross_compiler_tarball_type == "XZ":
-            ops.unTarXz(cross_compiler_tarball, cross_compiler_tarball_root)
+            ops.unTarXzSUDO(cross_compiler_tarball, cross_compiler_tarball_root)
         elif cross_compiler_tarball_type == "BZ2":
-            ops.unTarBz2(cross_compiler_tarball, cross_compiler_tarball_root)
+            ops.unTarBz2SUDO(cross_compiler_tarball, cross_compiler_tarball_root)
         elif cross_compiler_tarball_type == "GZ":
-            ops.unTarGz(cross_compiler_tarball, cross_compiler_tarball_root)
+            ops.unTarGzSUDO(cross_compiler_tarball, cross_compiler_tarball_root)
         else:
             sys.exit(1)
-    else:
-        copy_cc_libs()
+    #else:
+    #    copy_cc_libs()
+    copy_cc_libs()
 
     return True
 
