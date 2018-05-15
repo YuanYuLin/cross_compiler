@@ -29,6 +29,7 @@ def set_global(args):
     global cc_path
     global cc_name
     global cc_sysroot_lib
+    global cc_sysroot_usr_lib
     global cc_version
     global cc_sdk_sysroot
     pkg_path = args["pkg_path"]
@@ -54,6 +55,7 @@ def set_global(args):
         #cc_name=ops.path_join(cc_path, "arm-linux-gnueabihf-")
         cc_name="arm-linux-gnueabihf-"
         cc_sysroot_lib = ops.path_join(output_dir, "gcc-linaro-5.4.1-2017.01-x86_64_arm-linux-gnueabi/arm-linux-gnueabi/libc/lib")
+        cc_sysroot_usr_lib = ops.path_join(output_dir, "gcc-linaro-5.4.1-2017.01-x86_64_arm-linux-gnueabi/arm-linux-gnueabi/libc/usr/lib")
         cc_sdk_sysroot = ops.path_join(output_dir, "gcc-linaro-5.4.1-2017.01-x86_64_arm-linux-gnueabi/arm-linux-gnueabi/libc")
         cc_version = "2.21"
     elif arch_cc_version == "CodeSourcery-2014.05":
@@ -64,6 +66,7 @@ def set_global(args):
         #cc_name=ops.path_join(cc_path, "arm-none-linux-gnueabi-")
         cc_name="arm-none-linux-gnueabi-"
         cc_sysroot_lib = ops.path_join(output_dir, "arm-2014.05/arm-none-linux-gnueabi/libc/armv4t/lib")
+        cc_sysroot_usr_lib = ops.path_join(output_dir, "arm-2014.05/arm-none-linux-gnueabi/libc/armv4t/usr/lib")
         cc_sdk_sysroot = ops.path_join(output_dir, "arm-2014.05/arm-none-linux-gnueabi/libc/armv4t")
         cc_version = "2.18"
     elif arch_cc_version == "iopc_gcc_armel_2017.02.3":
@@ -74,6 +77,7 @@ def set_global(args):
         #cc_name=ops.path_join(cc_path, "arm-iopc-linux-gnueabi-")
         cc_name="arm-iopc-linux-gnueabi-"
         cc_sysroot_lib = ops.path_join(cross_compiler_tarball_root, "iopc_gcc_armel_2017.02.3/usr/arm-iopc-linux-gnueabi/sysroot/lib")
+        cc_sysroot_usr_lib = ops.path_join(cross_compiler_tarball_root, "iopc_gcc_armel_2017.02.3/usr/arm-iopc-linux-gnueabi/sysroot/usr/lib")
         cc_sdk_sysroot = ops.path_join(cross_compiler_tarball_root, "iopc_gcc_armel_2017.02.3/usr/arm-iopc-linux-gnueabi/sysroot")
         cc_version = "2.24"
     elif arch_cc_version == "iopc_gcc_x86_64_2017.02.3":
@@ -84,6 +88,7 @@ def set_global(args):
         #cc_name=ops.path_join(cc_path, "x86_64-iopc-linux-gnu-")
         cc_name="x86_64-iopc-linux-gnu-"
         cc_sysroot_lib = ops.path_join(cross_compiler_tarball_root, "iopc_gcc_x86_64_2017.02.3/usr/x86_64-iopc-linux-gnu/sysroot/lib")
+        cc_sysroot_usr_lib = ops.path_join(cross_compiler_tarball_root, "iopc_gcc_x86_64_2017.02.3/usr/x86_64-iopc-linux-gnu/sysroot/usr/lib")
         cc_sdk_sysroot = ops.path_join(cross_compiler_tarball_root, "iopc_gcc_x86_64_2017.02.3/usr/x86_64-iopc-linux-gnu/sysroot")
         cc_version = "2.24"
     else:
@@ -103,6 +108,7 @@ def MAIN_ENV(args):
 def copy_cc_libs():
     # Copy libraries from compiler sysroot
     cc_lib_path = cc_sysroot_lib
+    cc_usr_lib_path = cc_sysroot_usr_lib
     ops.mkdir(dst_lib_dir)
 
     if arch == "any":
@@ -183,6 +189,11 @@ def copy_cc_libs():
     ops.copyto(ops.path_join(cc_lib_path, "libresolv-{}.so".format(cc_version)), dst_lib_dir)
     ops.ln(dst_lib_dir, "libresolv-{}.so".format(cc_version), "libresolv.so.2")
     ops.ln(dst_lib_dir, "libresolv-{}.so".format(cc_version), "libresolv.so")
+
+    ops.copyto(ops.path_join(cc_usr_lib_path, "libstdc++.so.6.0.21"), dst_lib_dir)
+    ops.ln(dst_lib_dir, "libstdc++.so.6.0.21", "libstdc++.so.6.0")
+    ops.ln(dst_lib_dir, "libstdc++.so.6.0.21", "libstdc++.so.6")
+    ops.ln(dst_lib_dir, "libstdc++.so.6.0.21", "libstdc++.so")
 
 def copy_sdk_usr_libs():
     ops.mkdir(dst_usr_lib_dir)
