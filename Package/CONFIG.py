@@ -32,6 +32,7 @@ def set_global(args):
     global cc_sysroot_usr_lib
     global cc_version
     global cc_sdk_sysroot
+    global pkgconfig_dir
     pkg_path = args["pkg_path"]
     output_dir = args["output_path"]
     arch = ops.getEnv("ARCH_ALT")
@@ -96,6 +97,7 @@ def set_global(args):
 
     dst_lib_dir = ops.path_join(output_dir, "lib")
     dst_usr_lib_dir = ops.path_join(iopc.getSdkPath(), "usr/lib")
+    pkgconfig_dir = ops.path_join(iopc.getSdkPath(), "pkgconfig")
 
 def MAIN_ENV(args):
     set_global(args)
@@ -103,6 +105,7 @@ def MAIN_ENV(args):
     ops.exportEnv(ops.addEnv("PATH", cc_path))
     ops.exportEnv(ops.setEnv("CROSS_COMPILE", cc_name))
     ops.exportEnv(ops.setEnv("CC_SYSROOT", cc_sdk_sysroot))
+    ops.exportEnv(ops.setEnv("PKG_CONFIG_PATH", pkgconfig_dir))
     return False
 
 def copy_cc_libs():
@@ -190,6 +193,10 @@ def copy_cc_libs():
     ops.ln(dst_lib_dir, "libresolv-{}.so".format(cc_version), "libresolv.so.2")
     ops.ln(dst_lib_dir, "libresolv-{}.so".format(cc_version), "libresolv.so")
 
+    ops.copyto(ops.path_join(cc_lib_path, "libutil-{}.so".format(cc_version)), dst_lib_dir)
+    ops.ln(dst_lib_dir, "libutil-{}.so".format(cc_version), "libutil.so.1")
+    ops.ln(dst_lib_dir, "libutil-{}.so".format(cc_version), "libutil.so")
+
     ops.copyto(ops.path_join(cc_usr_lib_path, "libstdc++.so.6.0.21"), dst_lib_dir)
     ops.ln(dst_lib_dir, "libstdc++.so.6.0.21", "libstdc++.so.6.0")
     ops.ln(dst_lib_dir, "libstdc++.so.6.0.21", "libstdc++.so.6")
@@ -225,6 +232,7 @@ def MAIN_EXTRACT(args):
     #    copy_cc_libs()
     copy_cc_libs()
     #copy_sdk_usr_libs()
+    ops.mkdir(pkgconfig_dir)
 
     return True
 
