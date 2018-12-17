@@ -262,6 +262,26 @@ def MAIN_INSTALL(args):
 
     return False
 
+def MAIN_SDKENV(args):
+    set_global(args)
+    cc_sysroot = ops.getEnv("CC_SYSROOT")
+    cflags = ""
+    cflags += " -I" + ops.path_join(cc_sysroot, 'usr/include')
+    cflags += " -I" + ops.path_join(iopc.getSdkPath(), 'usr/include')
+    #cflags += " -I" + ops.path_join(iopc.getSdkPath(), 'usr/include/linux_headers')
+
+    libs = ""
+    libs += " -L" + ops.path_join(cc_sysroot, 'lib')
+    libs += " -L" + ops.path_join(cc_sysroot, 'usr/lib')
+    libs += " -L" + ops.path_join(iopc.getSdkPath(), 'lib')
+    libs += " -L" + ops.path_join(iopc.getSdkPath(), 'usr/lib')
+    libs += " -lm -ldl -lpthread -lrt"
+
+    iopc.add_includes(cflags)
+    iopc.add_libs(libs)
+
+    return False
+
 def MAIN_CLEAN_BUILD(args):
     set_global(args)
     return False
