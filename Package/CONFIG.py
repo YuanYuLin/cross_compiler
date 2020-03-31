@@ -274,7 +274,7 @@ def MAIN_SDKENV(args):
     libs += " -L" + ops.path_join(cc_sysroot, 'lib')
     libs += " -L" + ops.path_join(cc_sysroot, 'usr/lib')
     libs += " -L" + ops.path_join(iopc.getSdkPath(), 'lib')
-    libs += " -L" + ops.path_join(iopc.getSdkPath(), 'usr/lib')
+    #libs += " -L" + ops.path_join(iopc.getSdkPath(), 'usr/lib')
     libs += " -lm -ldl -lpthread -lrt"
 
     iopc.add_includes(cflags)
